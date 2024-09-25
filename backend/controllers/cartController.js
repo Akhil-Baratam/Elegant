@@ -19,12 +19,7 @@ const addToCart = async (req, res) => {
 
     if (!cart) {
       // Create a new cart if it doesn't exist
-      cart = new Cart({ user: userId, items: [] }); // Ensure items is initialized
-    }
-
-    // Ensure items is initialized
-    if (!cart.items) {
-      cart.items = []; // Initialize if undefined
+      cart = new Cart({ user: userId, items: [] });
     }
 
     // Check if the product is already in the cart
@@ -33,12 +28,17 @@ const addToCart = async (req, res) => {
     );
 
     if (existingItem) {
-      // Update the quantity if the product is already in the cart
-      return res.status(404).json({ error: "Product already exisits in the cart" });
-    } else {
-      // Add the new product to the cart
-      cart.items.push({ product: productId, quantity });
+      return res.status(400).json({ error: "Product already exists in the cart" });
     }
+
+    // Add the new product to the cart with additional details from the product
+    cart.items.push({
+      product: productId,
+      quantity,
+      price: product.price,
+      name: product.name,
+      image: product.image,
+    });
 
     await cart.save();
     res.status(200).json(cart);
@@ -47,7 +47,6 @@ const addToCart = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 // Remove product from cart
 const removeFromCart = async (req, res) => {
@@ -62,7 +61,7 @@ const removeFromCart = async (req, res) => {
     }
 
     // Remove the product from the cart
-    cart.items = cart.items.filter( // Updated here
+    cart.items = cart.items.filter(
       (item) => item.product.toString() !== productId.toString()
     );
 
@@ -74,13 +73,12 @@ const removeFromCart = async (req, res) => {
   }
 };
 
-
 // Update product quantity in cart
 const updateCartQuantity = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { productId } = req.params; // Product ID from the route
-    const { quantity } = req.body; // New quantity from request body
+    const { productId } = req.params;
+    const { quantity } = req.body;
 
     // Validate quantity
     if (quantity < 1) {
@@ -105,7 +103,6 @@ const updateCartQuantity = async (req, res) => {
     // Update the quantity
     itemInCart.quantity = quantity;
 
-    // Save the updated cart
     await cart.save();
     res.status(200).json(cart);
   } catch (error) {
@@ -114,12 +111,11 @@ const updateCartQuantity = async (req, res) => {
   }
 };
 
-
 // Get user's cart
 const getCart = async (req, res) => {
   try {
     const userId = req.user._id;
-    const cart = await Cart.findOne({ user: userId }).populate("items.product"); // Updated here
+    const cart = await Cart.findOne({ user: userId }).populate("items.product");
     if (!cart) {
       return res.status(404).json({ error: "Cart not found" });
     }
