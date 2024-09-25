@@ -269,30 +269,22 @@ const getWishlist = async (req, res) => {
   }
 };
 
-const getUserProducts = async (req, res) => {
+const getAdminProducts = async (req, res) => {
   try {
-    const { username } = req.params;
-
-    const user = await User.findOne({ username });
+    const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ error: "User not found" });
 
     const products = await Product.find({ user: user._id })
       .sort({ createdAt: -1 })
-      .populate({
-        path: "user",
-        select: "-password",
-      })
-      .populate({
-        path: "reviews.user",
-        select: "-password",
-      });
+      .populate("reviews.user", "-password");
 
     res.status(200).json(products);
   } catch (error) {
-    console.log("Error in getUserProducts controller: ", error);
+    console.log("Error in getAdminProducts controller: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 const addReview = async (req, res) => {
   try {
@@ -459,7 +451,7 @@ module.exports = {
   getAllProducts,
   updateProduct,
   getWishlist,
-  getUserProducts,
+  getAdminProducts,
   addReview,
   editReview,
   addQuestion,

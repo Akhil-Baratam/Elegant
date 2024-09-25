@@ -24,6 +24,10 @@ const cartSchema = new mongoose.Schema(
         image: String,
       },
     ],
+    totalPrice: {
+      type: Number,
+      required: true,
+    }
     
   },
   { timestamps: true }

@@ -31,6 +31,8 @@ app.use('/api/auth', require("./routes/authRoutes"));
 app.use('/api/users', require("./routes/userRoutes"));
 app.use('/api/products', require("./routes/productRoutes"));
 app.use('/api/cart', require("./routes/cartRoutes"));
+app.use('/api/orders', require("./routes/orderRoutes"));
+app.use('/api/coupons', require("./routes/couponRoutes"));
 // app.use('/api/notifications', require("./routes/notificationRoutes"));
 
 const port = process.env.PORT || 8000;

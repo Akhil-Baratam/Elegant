@@ -1,5 +1,15 @@
 const mongoose = require("mongoose");
 
+const addressSchema = new mongoose.Schema(
+  {
+    address: String,
+    city: String,
+    country: String,
+    state: String,
+    zipCode: String,
+  },
+);
+
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -37,6 +47,7 @@ const userSchema = new mongoose.Schema(
         default: [],
       }
     ],
+    addresses:[addressSchema],
     totalSales: {
       type: Number,
       default: 0,
